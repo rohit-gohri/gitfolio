@@ -72,7 +72,44 @@ module.exports.updateHTML = (username, opts) => {
                 icon.setAttribute("href", user.avatar_url);
                 icon.setAttribute("type", "image/png");
                 
-                document.getElementsByTagName("head")[0].appendChild(icon);
+                const ogTitle = document.createElement("meta");
+                ogTitle.setAttribute("property", "og:title");
+                ogTitle.setAttribute("content", `${user.name} (@${user.login})`);
+                const ogImage = document.createElement("meta");
+                ogImage.setAttribute("property", "og:image");
+                ogImage.setAttribute("content", user.avatar_url);
+                const ogDesc = document.createElement("meta");
+                ogDesc.setAttribute("property", "og:description");
+                ogDesc.setAttribute("content", user.bio);
+
+                const nameArr = (user.name && user.name.split(' ').filter(Boolean)) || [];
+                const ogProfile = document.createElement("meta");
+                ogProfile.setAttribute("property", "og:type");
+                ogProfile.setAttribute("content", 'profile');
+                const ogProfileFirst = document.createElement("meta");
+                ogProfileFirst.setAttribute("property", "profile:first_name");
+                ogProfileFirst.setAttribute("content", nameArr[0]);
+                const ogProfileLast = document.createElement("meta");
+                ogProfileLast.setAttribute("property", "profile:last_name");
+                ogProfileLast.setAttribute("content", nameArr[nameArr.length - 1]);
+                const ogProfileUsername = document.createElement("meta");
+                ogProfileUsername.setAttribute("property", "og:title");
+                ogProfileUsername.setAttribute("content", user.login);
+
+                const head = document.getElementsByTagName("head")[0];
+                head.appendChild(icon);
+                head.appendChild(ogtitle);
+                head.appendChild(ogImage);
+                head.appendChild(ogDesc);
+                head.appendChild(ogProfile);
+                if (nameArr.length > 0) {
+                    head.appendChild(ogProfileFirst);
+                }
+                if (nameArr.length > 1) {
+                    head.appendChild(ogProfileLast);
+                }
+                head.appendChild(ogProfileUsername);
+
                 document.getElementById("profile_img").style.background = `url('${user.avatar_url}') center center`
                 document.getElementById("username").innerHTML = `<span style="display:${user.name == null || !user.name ? 'none' : 'block'};">${user.name}</span><a href="${user.html_url}">@${user.login}</a>`;
                 //document.getElementById("github_link").href = `https://github.com/${user.login}`;
