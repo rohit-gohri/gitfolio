@@ -98,7 +98,7 @@ module.exports.updateHTML = (username, opts) => {
 
                 const head = document.getElementsByTagName("head")[0];
                 head.appendChild(icon);
-                head.appendChild(ogtitle);
+                head.appendChild(ogTitle);
                 head.appendChild(ogImage);
                 head.appendChild(ogDesc);
                 head.appendChild(ogProfile);
