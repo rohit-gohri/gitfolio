@@ -66,7 +66,7 @@ module.exports.updateHTML = (username, opts) => {
                         </a>`;
                 }
                 const user = await getUser(username);
-                document.title = user.login;
+                document.title = `${user.name} (@${user.login})`;
                 var icon = document.createElement("link");
                 icon.setAttribute("rel", "icon");
                 icon.setAttribute("href", user.avatar_url);
@@ -74,7 +74,7 @@ module.exports.updateHTML = (username, opts) => {
                 
                 const ogTitle = document.createElement("meta");
                 ogTitle.setAttribute("property", "og:title");
-                ogTitle.setAttribute("content", `${user.name} (@${user.login})`);
+                ogTitle.setAttribute("content", document.title);
                 const ogImage = document.createElement("meta");
                 ogImage.setAttribute("property", "og:image");
                 ogImage.setAttribute("content", user.avatar_url);
