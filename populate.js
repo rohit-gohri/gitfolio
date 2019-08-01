@@ -93,7 +93,7 @@ module.exports.updateHTML = (username, opts) => {
                 ogProfileLast.setAttribute("property", "profile:last_name");
                 ogProfileLast.setAttribute("content", nameArr[nameArr.length - 1]);
                 const ogProfileUsername = document.createElement("meta");
-                ogProfileUsername.setAttribute("property", "og:title");
+                ogProfileUsername.setAttribute("property", "profile:username");
                 ogProfileUsername.setAttribute("content", user.login);
 
                 const head = document.getElementsByTagName("head")[0];
