@@ -14,8 +14,8 @@ const config = path.join(outDir, 'config.json');
 
 /**
  * Creates the stylesheet used by the site from a template stylesheet.
- * 
- * Theme styles are added to the new stylesheet depending on command line 
+ *
+ * Theme styles are added to the new stylesheet depending on command line
  * arguments.
  */
 async function populateCSS({
@@ -23,7 +23,8 @@ async function populateCSS({
     background = 'https://images.unsplash.com/photo-1553748024-d1b27fb3f960?w=500&h=1000&q=80&fit=crop',
 } = {}) {
     /* Get the theme the user requests. Defaults to 'light' */
-    theme = `${theme}.css`;
+    if (!theme.endsWith('.css')) theme = `${theme}.css`;
+
     let template = path.resolve(assetDir, 'index.css');
     let stylesheet = path.join(outDir, 'index.css');
 
@@ -60,6 +61,7 @@ async function populateCSS({
     /* Update the config file with the user's theme choice */
     const data = await getConfig();
     data[0].theme = theme;
+    data[0].background = background;
     await fs.writeFileAsync(config, JSON.stringify(data, null, ' '));
 }
 
@@ -92,5 +94,6 @@ async function buildCommand(username, program) {
 }
 
 module.exports = {
+    populateCSS,
     buildCommand
 };
