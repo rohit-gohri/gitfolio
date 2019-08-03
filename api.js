@@ -17,6 +17,7 @@ async function getRepos(username, opts = {}) {
     const sort = opts.sort;
     const order = opts.order || (sort === "full_name" ? "asc" :"desc");
     const types = opts.types || [];
+    const blacklist = opts.blacklist || [];
     let type = "owner"
 
     if (types.includes('all') || (types.includes('owner') && types.includes('member'))) {
@@ -32,6 +33,9 @@ async function getRepos(username, opts = {}) {
         }
         tempRepos = await got(requestUrl);
         tempRepos = JSON.parse(tempRepos.body);
+        tempRepos = tempRepos.filter((repo) => {
+            return !blacklist.includes(repo.name) && !blacklist.includes(repo.full_name);
+        });
         repos = repos.concat(tempRepos);
     } while(tempRepos.length == 100);
     
