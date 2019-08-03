@@ -117,15 +117,26 @@ module.exports.updateHTML = (username, opts) => {
                 //document.getElementById("github_link").href = `https://github.com/${user.login}`;
                 document.getElementById("userbio").innerHTML = convertToEmoji(user.bio);
                 document.getElementById("userbio").style.display = user.bio == null || !user.bio ? 'none' : 'block';
-                document.getElementById("about").innerHTML = `
+
+
+                let about = `
                 <span style="display:${user.company == null || !user.company ? 'none' : 'block'};"><i class="fas fa-users"></i> &nbsp; ${user.company}</span>
                 <span style="display:${user.email == null || !user.email ? 'none' : 'block'};"><i class="fas fa-envelope"></i> &nbsp; ${user.email}</span>
                 <span style="display:${user.blog == null || !user.blog ? 'none' : 'block'};"><i class="fas fa-link"></i> &nbsp; <a href="${user.blog}">${user.blog}</a></span>
                 <span style="display:${twitter == null ? 'none' : 'block'};"><i class="fab fa-twitter-square"></i> &nbsp;&nbsp; <a href="https://www.twitter.com/${twitter}" target="_blank" class="socials"> Twitter</a></span>
                 <span style="display:${linkedin == null ? 'none' : 'block'};"><i class="fab fa-linkedin"></i> &nbsp;&nbsp; <a href="https://www.linkedin.com/in/${linkedin}/" target="_blank" class="socials"> LinkedIn</a></span>
                 <span style="display:${medium == null ? 'none' : 'block'};"><i class="fab fa-medium"></i> &nbsp;&nbsp; <a href="https://www.medium.com/@${medium}/" target="_blank" class="socials"> Medium</a></span>
-                <span style="display:${user.location == null || !user.location ? 'none' : 'block'};"><i class="fas fa-map-marker-alt"></i> &nbsp;&nbsp; ${user.location}</span>
-                <span style="display:${user.hireable == false || !user.hireable ? 'none' : 'block'};"><i class="fas fa-user-tie"></i> &nbsp;&nbsp; Available for hire</span>`;
+                <span style="display:${user.location == null || !user.location ? 'none' : 'block'};"><i class="fas fa-map-marker-alt"></i> &nbsp;&nbsp; ${user.location}</span>`;
+
+                about += `<span style="display:${user.hireable == false || !user.hireable ? 'none' : 'block'};">
+                    <i class="fas fa-user-tie"></i>
+                        ${data[0].hireLink ? `<a href="${data[0].hireLink}" target="_blank">` : ''}
+                        &nbsp;&nbsp; Available for hire
+                        ${data[0].hireLink ? `</a>` : ''}
+                    </span>`;
+
+                document.getElementById("about").innerHTML = about;
+
                 //add data to config.json
                 data[0].username = user.login;
                 data[0].name = user.name;
