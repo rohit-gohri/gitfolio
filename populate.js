@@ -1,5 +1,6 @@
 const fs = require('fs');
 const emoji = require('github-emoji');
+const _ = require('lodash');
 const jsdom = require('jsdom').JSDOM,
     options = {
         resources: "usable"
@@ -29,86 +30,87 @@ function convertToEmoji(text) {
     }
 }
 
+async function addRepoDetails(document, username, opts) {
+    const repos = await getRepos(username, opts)
+
+    for (var i = 0; i < repos.length; i++) {
+        let element;
+        if(repos[i].fork == false){
+            element = document.getElementById("work_section")
+            
+        }else if(opts.includeFork == true){
+            document.getElementById("forks").style.display = "block";
+            element = document.getElementById("forks_section");
+        }else {
+            continue;
+        }
+        element.innerHTML += `
+            <a href="${repos[i].html_url}" target="_blank">
+            <section>
+                <div class="section_title">${repos[i].name}</div>
+                <div class="about_section">
+                <span style="display:${repos[i].description == undefined ? 'none' : 'block'};">${convertToEmoji(repos[i].description)}</span>
+                </div>
+                <div class="bottom_section">
+                    <span style="display:${repos[i].language == null ? 'none' : 'inline-block'};"><i class="fas fa-code"></i>&nbsp; ${repos[i].language}</span>
+                    <span><i class="fas fa-star"></i>&nbsp; ${repos[i].stargazers_count}</span>
+                    <span><i class="fas fa-code-branch"></i>&nbsp; ${repos[i].forks_count}</span>
+                </div>
+            </section>
+            </a>`;
+    }
+}
+
+function addMetaTags(document, user) {
+    
+    const nameArr = (user.name && user.name.split(' ').filter(Boolean)) || [];
+    const data = {
+        nameAndUsername: `${user.name} (@${user.login})`,
+        firstName: nameArr[0],
+        lastName: nameArr[nameArr.length - 1],
+        user,
+    };
+    const metaTags = {
+        description: 'user.bio',
+        'og:title':  'nameAndUsername',
+        'og:image': 'user.avatar_url',
+        'og:description': 'user.bio',
+        'og:type': {val: 'profile'},
+        'profile:first_name': 'firstName',
+        'profile:last_name': 'lastName',
+        'profile:username': 'user.login',
+    };
+    
+    const head = document.getElementsByTagName("head")[0];
+    document.title = data.nameAndUsername;
+    const icon = document.createElement("link");
+    icon.setAttribute("rel", "icon");
+    icon.setAttribute("href", user.avatar_url);
+    icon.setAttribute("type", "image/png");
+    head.appendChild(icon);
+
+    Object.keys(metaTags).forEach((property) => {
+        const el = document.createElement("meta");
+        el.setAttribute('type', property);
+        const content = _.get(data, metaTags[property]);
+        if (!content) return;
+        el.setAttribute('content', content);
+        head.appendChild(el);
+    })
+}
+
 module.exports.updateHTML = (username, opts) => {
-    const {includeFork, twitter, linkedin, medium} = opts;
+    const {twitter, linkedin, medium} = opts;
     //add data to assets/index.html
     jsdom.fromFile(`${__dirname}/assets/index.html`, options).then(function (dom) {
         let window = dom.window, document = window.document;
         (async () => {
             try {
                 console.log("Building HTML/CSS...");
-                const repos = await getRepos(username, opts)
-
-                for (var i = 0; i < repos.length; i++) {
-                    let element;
-                    if(repos[i].fork == false){
-                        element = document.getElementById("work_section")
-                        
-                    }else if(includeFork == true){
-                        document.getElementById("forks").style.display = "block";
-                        element = document.getElementById("forks_section");
-                    }else {
-                        continue;
-                    }
-                    element.innerHTML += `
-                        <a href="${repos[i].html_url}" target="_blank">
-                        <section>
-                            <div class="section_title">${repos[i].name}</div>
-                            <div class="about_section">
-                            <span style="display:${repos[i].description == undefined ? 'none' : 'block'};">${convertToEmoji(repos[i].description)}</span>
-                            </div>
-                            <div class="bottom_section">
-                                <span style="display:${repos[i].language == null ? 'none' : 'inline-block'};"><i class="fas fa-code"></i>&nbsp; ${repos[i].language}</span>
-                                <span><i class="fas fa-star"></i>&nbsp; ${repos[i].stargazers_count}</span>
-                                <span><i class="fas fa-code-branch"></i>&nbsp; ${repos[i].forks_count}</span>
-                            </div>
-                        </section>
-                        </a>`;
-                }
+                const data = await getConfig();
+                await addRepoDetails(document, username, opts);
                 const user = await getUser(username);
-                document.title = `${user.name} (@${user.login})`;
-                var icon = document.createElement("link");
-                icon.setAttribute("rel", "icon");
-                icon.setAttribute("href", user.avatar_url);
-                icon.setAttribute("type", "image/png");
-                
-                const ogTitle = document.createElement("meta");
-                ogTitle.setAttribute("property", "og:title");
-                ogTitle.setAttribute("content", document.title);
-                const ogImage = document.createElement("meta");
-                ogImage.setAttribute("property", "og:image");
-                ogImage.setAttribute("content", user.avatar_url);
-                const ogDesc = document.createElement("meta");
-                ogDesc.setAttribute("property", "og:description");
-                ogDesc.setAttribute("content", user.bio);
-
-                const nameArr = (user.name && user.name.split(' ').filter(Boolean)) || [];
-                const ogProfile = document.createElement("meta");
-                ogProfile.setAttribute("property", "og:type");
-                ogProfile.setAttribute("content", 'profile');
-                const ogProfileFirst = document.createElement("meta");
-                ogProfileFirst.setAttribute("property", "profile:first_name");
-                ogProfileFirst.setAttribute("content", nameArr[0]);
-                const ogProfileLast = document.createElement("meta");
-                ogProfileLast.setAttribute("property", "profile:last_name");
-                ogProfileLast.setAttribute("content", nameArr[nameArr.length - 1]);
-                const ogProfileUsername = document.createElement("meta");
-                ogProfileUsername.setAttribute("property", "profile:username");
-                ogProfileUsername.setAttribute("content", user.login);
-
-                const head = document.getElementsByTagName("head")[0];
-                head.appendChild(icon);
-                head.appendChild(ogTitle);
-                head.appendChild(ogImage);
-                head.appendChild(ogDesc);
-                head.appendChild(ogProfile);
-                if (nameArr.length > 0) {
-                    head.appendChild(ogProfileFirst);
-                }
-                if (nameArr.length > 1) {
-                    head.appendChild(ogProfileLast);
-                }
-                head.appendChild(ogProfileUsername);
+                addMetaTags(document, user);
 
                 document.getElementById("profile_img").style.background = `url('${user.avatar_url}') center center`
                 document.getElementById("username").innerHTML = `<span style="display:${user.name == null || !user.name ? 'none' : 'block'};">${user.name}</span><a href="${user.html_url}">@${user.login}</a>`;
@@ -125,7 +127,6 @@ module.exports.updateHTML = (username, opts) => {
                 <span style="display:${user.location == null || !user.location ? 'none' : 'block'};"><i class="fas fa-map-marker-alt"></i> &nbsp;&nbsp; ${user.location}</span>
                 <span style="display:${user.hireable == false || !user.hireable ? 'none' : 'block'};"><i class="fas fa-user-tie"></i> &nbsp;&nbsp; Available for hire</span>`;
                 //add data to config.json
-                const data = await getConfig();
                 data[0].username = user.login;
                 data[0].name = user.name;
                 data[0].userimg = user.avatar_url;
