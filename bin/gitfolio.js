@@ -41,6 +41,7 @@ program
     .option('-p, --pagetitle [pagetitle]', 'give blog page a title')
     .option('-f, --folder [folder]', 'give folder a title (use "-" instead of spaces)')
     .option('-i, --image [image]', 'give image for blog cover')
+    .option('-u, --update', 'update existing blog if exists')
     .action(blogCommand);
 
 program

@@ -7,7 +7,13 @@ options = {
 };
 const {getConfig, getBlog, updateBlog, outDir} = require('./utils');
 
-async function createBlog(title, {subtitle, pagetitle, folder, image} = {}) {
+async function createBlog(title, {
+    subtitle,
+    pagetitle,
+    folder,
+    image,
+    update = false,
+} = {}) {
     if (!pagetitle) {
         pagetitle = title;
     }
@@ -24,8 +30,6 @@ async function createBlog(title, {subtitle, pagetitle, folder, image} = {}) {
     if (!fs.existsSync(`${outDir}/blog/${folder}`)){
         fs.mkdirSync(`${outDir}/blog/${folder}`, { recursive: true });
     }
-
-    const blogPath = `${outDir}/blog/${folder}/index.html`;
     const blog_data = {
         created_at: new Date(),
         url_title: folder,
@@ -35,6 +39,15 @@ async function createBlog(title, {subtitle, pagetitle, folder, image} = {}) {
         visible: true,
     };
     const conf = await getConfig();
+    const old_blogs = await getBlog();
+
+    const conflicting = old_blogs.filter(blog => blog.url_title === blog_data.url_title);
+    if (conflicting.length && !update) {
+        console.error('Blog conflicts with existing one. Use --update to overwrite');
+        return;
+    }
+    
+    const blogPath = `${outDir}/blog/${folder}/index.html`;
     await fs.copyFileAsync(`${__dirname}/assets/blog/blogTemplate.html`, blogPath);
     const dom = await jsdom.fromFile(blogPath, options);
     const window = dom.window;
@@ -63,8 +76,17 @@ async function createBlog(title, {subtitle, pagetitle, folder, image} = {}) {
     await fs.writeFileAsync(`${outDir}/blog/${folder}/index.html`,
         '<!DOCTYPE html>'+window.document.documentElement.outerHTML);
 
-    const old_blogs = await getBlog();
-    old_blogs.push(blog_data);
+    if (conflicting.length) {
+        old_blogs.forEach(blog => {
+            if (blog.url_title !== blog_data.url_title) return;
+            blog_data.modified_at = blog_data.created_at;
+            delete blog_data.created_at;
+            Object.assign(blog, blog_data);
+        });
+    }
+    else {
+        old_blogs.push(blog_data);
+    }
     await updateBlog(old_blogs);
 }
 
