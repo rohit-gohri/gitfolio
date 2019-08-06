@@ -29,6 +29,11 @@ async function updateConfig(data) {
     console.log("Config file updated.");
 }
 
+async function updateBlog(data) {
+    await fs.writeFileAsync(`${outDir}/blog.json`, JSON.stringify(data, null, ' '));
+    console.log('Blog Created Successfully in "blog" folder.');
+}
+
 async function getConfig() {
     return getFileWithDefaults(configPath, defaultConfigPath);
 }
@@ -41,5 +46,6 @@ module.exports = {
     outDir,
     getConfig,
     updateConfig,
-    getBlog
+    getBlog,
+    updateBlog,
 };
