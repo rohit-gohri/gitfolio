@@ -130,8 +130,9 @@ module.exports.updateHTML = (username, opts) => {
 
                 about += `<span style="display:${user.hireable == false || !user.hireable ? 'none' : 'block'};">
                     <i class="fas fa-user-tie"></i>
+                        &nbsp;&nbsp;
                         ${data[0].hireLink ? `<a href="${data[0].hireLink}" target="_blank">` : ''}
-                        &nbsp;&nbsp; Available for hire
+                        Available for hire
                         ${data[0].hireLink ? `</a>` : ''}
                     </span>`;
 
