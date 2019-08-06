@@ -10,7 +10,7 @@ async function updateCommand() {
         console.log("username not found in config.json, please run build command before using update");
         return;
     }
-    updateHTML(username, data[0]);
+    return updateHTML(username, data[0]);
 }
 
 module.exports = {

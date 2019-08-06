@@ -90,7 +90,7 @@ async function buildCommand(username, program) {
     };
 
     await populateConfig(opts);
-    updateHTML(('%s', username), opts);
+    await updateHTML(('%s', username), opts);
 }
 
 module.exports = {

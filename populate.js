@@ -99,59 +99,71 @@ function addMetaTags(document, user, config = {}) {
     })
 }
 
-module.exports.updateHTML = (username, opts) => {
+module.exports.updateHTML = async (username, opts) => {
     const {twitter, linkedin, medium} = opts;
+    const user = await getUser(username);
+    const data = await getConfig();
+    data[0].username = user.login;
+    data[0].name = user.name;
+    data[0].userimg = user.avatar_url;
+    await updateConfig(data);
+
     //add data to assets/index.html
-    jsdom.fromFile(`${__dirname}/assets/index.html`, options).then(function (dom) {
-        let window = dom.window, document = window.document;
-        (async () => {
-            try {
-                console.log("Building HTML/CSS...");
-                const user = await getUser(username);
-                const data = await getConfig();
-                data[0].username = user.login;
-                data[0].name = user.name;
-                data[0].userimg = user.avatar_url;
-                await updateConfig(data);
-                
-                await addRepoDetails(document, username, opts);
-                addMetaTags(document, user, data[0]);
+    const dom = await jsdom.fromFile(`${__dirname}/assets/index.html`, options);
+    const window = dom.window;
+    const document = window.document;
+    
+    console.log("Building HTML/CSS...");
 
-                document.getElementById("profile_img").style.background = `url('${user.avatar_url}') center center`
-                document.getElementById("username").innerHTML = `<span style="display:${user.name == null || !user.name ? 'none' : 'block'};">${user.name}</span><a href="${user.html_url}">@${user.login}</a>`;
-                //document.getElementById("github_link").href = `https://github.com/${user.login}`;
-                document.getElementById("userbio").innerHTML = convertToEmoji(user.bio);
-                document.getElementById("userbio").style.display = user.bio == null || !user.bio ? 'none' : 'block';
+    await addRepoDetails(document, username, opts);
+    addMetaTags(document, user, data[0]);
 
+    document.getElementById("profile_img").style.background = `url('${user.avatar_url}') center center`
+    document.getElementById("username").innerHTML = 
+        `<span style="display:${!user.name ? 'none' : 'block'};">
+            ${user.name}
+        </span>
+        <a href="${user.html_url}">@${user.login}</a>`;
 
-                let about = `
-                <span style="display:${user.company == null || !user.company ? 'none' : 'block'};"><i class="fas fa-users"></i> &nbsp; ${user.company}</span>
-                <span style="display:${user.email == null || !user.email ? 'none' : 'block'};"><i class="fas fa-envelope"></i> &nbsp; ${user.email}</span>
-                <span style="display:${user.blog == null || !user.blog ? 'none' : 'block'};"><i class="fas fa-link"></i> &nbsp; <a href="${user.blog}">${user.blog}</a></span>
-                <span style="display:${twitter == null ? 'none' : 'block'};"><i class="fab fa-twitter-square"></i> &nbsp;&nbsp; <a href="https://www.twitter.com/${twitter}" target="_blank" class="socials"> Twitter</a></span>
-                <span style="display:${linkedin == null ? 'none' : 'block'};"><i class="fab fa-linkedin"></i> &nbsp;&nbsp; <a href="https://www.linkedin.com/in/${linkedin}/" target="_blank" class="socials"> LinkedIn</a></span>
-                <span style="display:${medium == null ? 'none' : 'block'};"><i class="fab fa-medium"></i> &nbsp;&nbsp; <a href="https://www.medium.com/@${medium}/" target="_blank" class="socials"> Medium</a></span>
-                <span style="display:${user.location == null || !user.location ? 'none' : 'block'};"><i class="fas fa-map-marker-alt"></i> &nbsp;&nbsp; ${user.location}</span>`;
+    //document.getElementById("github_link").href = `https://github.com/${user.login}`;
+    document.getElementById("userbio").innerHTML = convertToEmoji(user.bio);
+    document.getElementById("userbio").style.display = !user.bio ? 'none' : 'block';
 
-                about += `<span style="display:${user.hireable == false || !user.hireable ? 'none' : 'block'};">
-                    <i class="fas fa-user-tie"></i>
-                        &nbsp;&nbsp;
-                        ${data[0].hireLink ? `<a href="${data[0].hireLink}" target="_blank">` : ''}
-                        Available for hire
-                        ${data[0].hireLink ? `</a>` : ''}
-                    </span>`;
+    let about = `
+        <span style="display:${!user.company ? 'none' : 'block'};">
+            <i class="fas fa-users"></i> &nbsp; ${user.company}
+        </span>
+        <span style="display:${!user.email ? 'none' : 'block'};">
+            <i class="fas fa-envelope"></i> &nbsp; ${user.email}
+        </span>
+        <span style="display:${!user.blog ? 'none' : 'block'};">
+            <i class="fas fa-link"></i> &nbsp; <a href="${user.blog}">${user.blog}</a>
+        </span>
+        <span style="display:${!twitter? 'none' : 'block'};">
+            <i class="fab fa-twitter-square"></i> &nbsp;&nbsp; <a href="https://www.twitter.com/${twitter}" target="_blank" class="socials"> Twitter</a>
+        </span>
+        <span style="display:${!linkedin? 'none' : 'block'};">
+            <i class="fab fa-linkedin"></i> &nbsp;&nbsp; <a href="https://www.linkedin.com/in/${linkedin}/" target="_blank" class="socials"> LinkedIn</a>
+        </span>
+        <span style="display:${!medium? 'none' : 'block'};">
+            <i class="fab fa-medium"></i> &nbsp;&nbsp; <a href="https://www.medium.com/@${medium}/" target="_blank" class="socials"> Medium</a>
+        </span>
+        <span style="display:${!user.location ? 'none' : 'block'};">
+            <i class="fas fa-map-marker-alt"></i> &nbsp;&nbsp; ${user.location}
+        </span>`;
 
-                document.getElementById("about").innerHTML = about;
+    about += 
+        `<span style="display:${user.hireable == false || !user.hireable ? 'none' : 'block'};">
+            <i class="fas fa-user-tie"></i>
+            &nbsp;&nbsp;
+            ${data[0].hireLink ? `<a href="${data[0].hireLink}" target="_blank">` : ''}
+            Available for hire
+            ${data[0].hireLink ? `</a>` : ''}
+        </span>`;
 
-                await fs.writeFileAsync(`${outDir}/index.html`,
-                    '<!DOCTYPE html>' + window.document.documentElement.outerHTML);
-                console.log(`Build Complete, Files can be Found @ ${outDir}`);
+    document.getElementById("about").innerHTML = about;
 
-            } catch (error) {
-                console.log(error);
-            }
-        })();
-    }).catch(function (error) {
-        console.log(error);
-    });
+    await fs.writeFileAsync(`${outDir}/index.html`,
+        '<!DOCTYPE html>' + window.document.documentElement.outerHTML);
+    console.log(`Build Complete, Files can be Found @ ${outDir}`);
 }
