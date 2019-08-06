@@ -31,8 +31,10 @@
             <div class="projects" id="work_section"></div>
         </div>
         <div id="forks" style="display:none;">
-            <h1>Forks.</h1>
-            <div class="projects" id="forks_section"></div>
+            <button class="collapsible">
+                <h1>Forks.</h1>
+            </button>
+            <div class="projects collapsible-content" id="forks_section"></div>
         </div>
         <div id="blog_section">
             <h1>Blog.</h1>
@@ -63,7 +65,7 @@
     </script>
 
     <script>
-        const magicProjectsGrid = new MagicGrid({
+        var magicProjectsGrid = new MagicGrid({
           container: '#work_section',
           animate: false,
           gutter: 30, // default gutter size
@@ -73,7 +75,7 @@
           useTransform: true
         });
 
-        const magicForksGrid = new MagicGrid({
+        var magicForksGrid = new MagicGrid({
           container: '#forks_section',
           animate: false,
           gutter: 30, // default gutter size
@@ -82,6 +84,21 @@
           maxColumns: 2,
           useTransform: true
         })
+
+        var coll = document.getElementsByClassName("collapsible");
+        var i;
+
+        for (i = 0; i < coll.length; i++) {
+            coll[i].addEventListener("click", function() {
+                this.classList.toggle("collapsible-active");
+                var content = this.nextElementSibling;
+                if (content.style.maxHeight){
+                    content.style.maxHeight = null;
+                } else {
+                    content.style.maxHeight = content.scrollHeight + "px";
+                }
+            });
+        }
 
         document.addEventListener("DOMContentLoaded", function(event) { 
             magicProjectsGrid.listen();
