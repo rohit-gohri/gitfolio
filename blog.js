@@ -7,7 +7,15 @@ options = {
 };
 const {getBlog, updateBlog, outDir} = require('./utils');
 
-async function createBlog(title, subtitle, pagetitle, folder) {
+async function createBlog(title, {subtitle, pagetitle, folder, image} = {}) {
+    if (!pagetitle) {
+        pagetitle = title;
+    }
+    if (!folder) {
+        folder = title;
+    }
+    folder = _.kebabCase(folder.toLowerCase());
+
     // Checks to make sure this directory actually exists
     // and creates it if it doesn't
     if (!fs.existsSync(`${outDir}/blog/`)){
@@ -16,9 +24,11 @@ async function createBlog(title, subtitle, pagetitle, folder) {
     if (!fs.existsSync(`${outDir}/blog/${folder}`)){
         fs.mkdirSync(`${outDir}/blog/${folder}`, { recursive: true });
     }
-    await fs.copyFileAsync(`${__dirname}/assets/blog/blogTemplate.html`, `${outDir}/blog/${folder}/index.html`);
 
-    const dom = await jsdom.fromFile(`${outDir}/blog/${folder}/index.html`, options);
+    const blogPath = `${outDir}/blog/${folder}/index.html`;
+
+    await fs.copyFileAsync(`${__dirname}/assets/blog/blogTemplate.html`, blogPath);
+    const dom = await jsdom.fromFile(blogPath, options);
     const window = dom.window;
     const document = window.document;
     const style = document.createElement("link");
@@ -30,12 +40,14 @@ async function createBlog(title, subtitle, pagetitle, folder) {
     document.getElementById("blog_title").textContent = title;
     document.getElementById("blog_sub_title").textContent = subtitle;
 
-    await fs.writeFileAsync(`${outDir}/blog/${folder}/index.html`, '<!DOCTYPE html>'+window.document.documentElement.outerHTML);
+    await fs.writeFileAsync(`${outDir}/blog/${folder}/index.html`,
+        '<!DOCTYPE html>'+window.document.documentElement.outerHTML);
+
     const blog_data = {
         url_title: folder,
         title: title,
         sub_title: subtitle,
-        top_image: "https://images.unsplash.com/photo-1553748024-d1b27fb3f960?w=1450",
+        top_image: image || "https://images.unsplash.com/photo-1553748024-d1b27fb3f960?w=1450",
         visible: true,
     };
     const old_blogs = await getBlog();
@@ -48,14 +60,7 @@ async function blogCommand(title, program) {
     if (!fs.existsSync(`${outDir}/index.html`) || !fs.existsSync(`${outDir}/index.css`)){
         return console.error("You need to run build command before using blog one");
     }
-    if (!program.pagetitle) {
-        program.pagetitle = title;
-    }
-    if (!program.folder) {
-        program.folder = title;
-    }
-    program.folder = _.kebabCase(program.folder.toLowerCase());
-    return createBlog(title, program.subtitle, program.pagetitle, program.folder);
+    return createBlog(title, program);
 }
 
 module.exports = {

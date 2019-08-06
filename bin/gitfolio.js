@@ -40,6 +40,7 @@ program
     .option('-s, --subtitle [subtitle]', 'give blog a subtitle', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.')
     .option('-p, --pagetitle [pagetitle]', 'give blog page a title')
     .option('-f, --folder [folder]', 'give folder a title (use "-" instead of spaces)')
+    .option('-i, --image [image]', 'give image for blog cover')
     .action(blogCommand);
 
 program
