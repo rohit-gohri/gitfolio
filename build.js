@@ -7,7 +7,7 @@ const hbs = require('handlebars');
     from callback-passed async functions      */
 const fs = bluebird.promisifyAll(require('fs'));
 const { updateHTML } = require('./populate');
-const { getConfig, outDir } = require('./utils');
+const { getConfig, updateConfig, outDir } = require('./utils');
 
 const assetDir = path.resolve(`${__dirname}/assets/`);
 const config = path.join(outDir, 'config.json');
@@ -62,13 +62,13 @@ async function populateCSS({
     const data = await getConfig();
     data[0].theme = theme;
     data[0].background = background;
-    await fs.writeFileAsync(config, JSON.stringify(data, null, ' '));
+    await updateConfig(data);
 }
 
 async function populateConfig(opts) {
     const data = await getConfig();
     Object.assign(data[0], opts);
-    await fs.writeFileAsync(config, JSON.stringify(data, null, ' '));
+    await updateConfig(data);
 }
 
 async function buildCommand(username, program) {

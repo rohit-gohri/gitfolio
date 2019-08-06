@@ -1,11 +1,12 @@
-const fs = require('fs');
+const bluebird = require('bluebird');
+const fs = bluebird.promisifyAll(require('fs'));
 const emoji = require('github-emoji');
 const _ = require('lodash');
 const jsdom = require('jsdom').JSDOM,
     options = {
         resources: "usable"
     };
-const { getConfig, outDir } = require('./utils');
+const { getConfig, updateConfig, outDir } = require('./utils');
 const { getRepos, getUser } = require('./api');
 
 function convertToEmoji(text) {
@@ -106,9 +107,14 @@ module.exports.updateHTML = (username, opts) => {
         (async () => {
             try {
                 console.log("Building HTML/CSS...");
-                const data = await getConfig();
-                await addRepoDetails(document, username, opts);
                 const user = await getUser(username);
+                const data = await getConfig();
+                data[0].username = user.login;
+                data[0].name = user.name;
+                data[0].userimg = user.avatar_url;
+                await updateConfig(data);
+                
+                await addRepoDetails(document, username, opts);
                 addMetaTags(document, user, data[0]);
 
                 document.getElementById("profile_img").style.background = `url('${user.avatar_url}') center center`
@@ -137,19 +143,10 @@ module.exports.updateHTML = (username, opts) => {
 
                 document.getElementById("about").innerHTML = about;
 
-                //add data to config.json
-                data[0].username = user.login;
-                data[0].name = user.name;
-                data[0].userimg = user.avatar_url;
-                
-                await fs.writeFile(`${outDir}/config.json`, JSON.stringify(data, null, ' '), function (err) {
-                    if (err) throw err;
-                    console.log("Config file updated.");
-                });
-                await fs.writeFile(`${outDir}/index.html`, '<!DOCTYPE html>' + window.document.documentElement.outerHTML, function (error) {
-                    if (error) throw error;
-                    console.log(`Build Complete, Files can be Found @ ${outDir}`);
-                });
+                await fs.writeFileAsync(`${outDir}/index.html`,
+                    '<!DOCTYPE html>' + window.document.documentElement.outerHTML);
+                console.log(`Build Complete, Files can be Found @ ${outDir}`);
+
             } catch (error) {
                 console.log(error);
             }
