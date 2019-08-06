@@ -71,7 +71,6 @@ function addMetaTags(document, user, config = {}) {
         image: config.socialPreviewImg || user.avatar_url,
     };
     const metaTags = {
-        description: user.bio,
         'og:title':  data.nameAndUsername,
         'og:image': data.image,
         'og:description': user.bio,
@@ -88,10 +87,14 @@ function addMetaTags(document, user, config = {}) {
     icon.setAttribute("href", user.avatar_url);
     icon.setAttribute("type", "image/png");
     head.appendChild(icon);
+    const description = document.createElement("meta");
+    icon.setAttribute("name", "description");
+    icon.setAttribute("content", user.bio);
+    head.appendChild(description);
 
     Object.keys(metaTags).forEach((property) => {
         const el = document.createElement("meta");
-        el.setAttribute('type', property);
+        el.setAttribute('property', property);
         const content = metaTags[property];
         if (!content) return;
         el.setAttribute('content', content);
