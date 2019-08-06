@@ -14,10 +14,17 @@ function runCommand(){
   app.listen(3000);
 
   defaultBrowser(function (err, res) {
-      if(err) throw err;
+      if(err) {
+        console.error('Could not find default browser:', err);
+      }
       (async () => {
+        if(!err && res.commonName) {
           await open('http://localhost:3000', {app: res.commonName});
-          console.log("ctrl + c to exit");
+        }
+        else {
+          console.log('Server listening on http://localhost:3000');
+        }
+        console.log("ctrl + c to exit");
       })();
   });
 }
