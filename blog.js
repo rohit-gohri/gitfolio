@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const fs = require('fs');
 const jsdom = require('jsdom').JSDOM,
 options = {
@@ -60,6 +61,7 @@ function blogCommand(title, program) {
     if (!program.folder) {
         program.folder = title;
     }
+    program.folder = _.kebabCase(program.folder.toLowerCase());
     createBlog(title, program.subtitle, program.pagetitle, program.folder);
 }
 
