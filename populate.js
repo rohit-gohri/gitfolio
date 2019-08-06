@@ -69,15 +69,23 @@ function addMetaTags(document, user, config = {}) {
         firstName: nameArr[0],
         lastName: nameArr[nameArr.length - 1],
         image: config.socialPreviewImg || user.avatar_url,
+        imageAlt: config.socialPreviewImg ? config.socialPreviewImgAlt : 'User Avatar Picture',
     };
     const metaTags = {
+        'og:url': config.url,
         'og:title':  data.nameAndUsername,
         'og:image': data.image,
+        'og:image:alt': data.imageAlt,
         'og:description': user.bio,
         'og:type': 'profile',
         'profile:first_name': data.firstName,
         'profile:last_name': data.lastName,
         'profile:username': user.login,
+        'twitter:card': 'summary_large_image',
+        'twitter:site': config.twitter,
+        'twitter:creator': config.twitter,
+        'twitter:image': data.image,
+        'twitter:image:alt': data.imageAlt,
     };
     
     const head = document.getElementsByTagName("head")[0];
