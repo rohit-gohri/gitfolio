@@ -61,24 +61,23 @@ async function addRepoDetails(document, username, opts) {
     }
 }
 
-function addMetaTags(document, user) {
-    
+function addMetaTags(document, user, config = {}) {    
     const nameArr = (user.name && user.name.split(' ').filter(Boolean)) || [];
     const data = {
         nameAndUsername: `${user.name} (@${user.login})`,
         firstName: nameArr[0],
         lastName: nameArr[nameArr.length - 1],
-        user,
+        image: config.socialPreviewImg || user.avatar_url,
     };
     const metaTags = {
-        description: 'user.bio',
-        'og:title':  'nameAndUsername',
-        'og:image': 'user.avatar_url',
-        'og:description': 'user.bio',
-        'og:type': {val: 'profile'},
-        'profile:first_name': 'firstName',
-        'profile:last_name': 'lastName',
-        'profile:username': 'user.login',
+        description: user.bio,
+        'og:title':  data.nameAndUsername,
+        'og:image': data.image,
+        'og:description': user.bio,
+        'og:type': 'profile',
+        'profile:first_name': data.firstName,
+        'profile:last_name': data.lastName,
+        'profile:username': user.login,
     };
     
     const head = document.getElementsByTagName("head")[0];
@@ -92,7 +91,7 @@ function addMetaTags(document, user) {
     Object.keys(metaTags).forEach((property) => {
         const el = document.createElement("meta");
         el.setAttribute('type', property);
-        const content = _.get(data, metaTags[property]);
+        const content = metaTags[property];
         if (!content) return;
         el.setAttribute('content', content);
         head.appendChild(el);
@@ -110,7 +109,7 @@ module.exports.updateHTML = (username, opts) => {
                 const data = await getConfig();
                 await addRepoDetails(document, username, opts);
                 const user = await getUser(username);
-                addMetaTags(document, user);
+                addMetaTags(document, user, data[0]);
 
                 document.getElementById("profile_img").style.background = `url('${user.avatar_url}') center center`
                 document.getElementById("username").innerHTML = `<span style="display:${user.name == null || !user.name ? 'none' : 'block'};">${user.name}</span><a href="${user.html_url}">@${user.login}</a>`;
