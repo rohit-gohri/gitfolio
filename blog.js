@@ -5,6 +5,7 @@ const jsdom = require('jsdom').JSDOM,
 options = {
     resources: "usable"
 };
+const {updateHTML} = require('./populate');
 const {getConfig, getBlog, updateBlog, outDir} = require('./utils');
 
 async function createBlog(title, {
@@ -88,6 +89,7 @@ async function createBlog(title, {
         old_blogs.push(blog_data);
     }
     await updateBlog(old_blogs);
+    await updateHTML(conf[0].username, conf[0]);
 }
 
 async function blogCommand(title, program) {

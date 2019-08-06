@@ -6,7 +6,7 @@ const jsdom = require('jsdom').JSDOM,
     options = {
         resources: "usable"
     };
-const { getConfig, updateConfig, outDir } = require('./utils');
+const { getBlog, getConfig, updateConfig, outDir } = require('./utils');
 const { getRepos, getUser } = require('./api');
 
 function convertToEmoji(text) {
@@ -99,6 +99,31 @@ function addMetaTags(document, user, config = {}) {
     })
 }
 
+async function addBlogs(document) {
+    const blogConfig = await getBlog();
+    if (blogConfig.length == 0) {
+        return document.getElementById("blog_section").style.display = "none";
+    }
+    const blogsEl = document.getElementById("blogs");
+    for (var i = 0; i < blogConfig.length; i++) {
+        const blogEl = document.createElement('a');
+        blogEl.setAttribute('href', `./blog/${blogConfig[i].url_title}/`);
+        blogEl.setAttribute('target', '_blank');
+        blogEl.innerHTML = 
+            `<section>
+                <img src="${blogConfig[i].top_image}">
+                <div class="blog_container">
+                    <div class="section_title">${blogConfig[i].title}</div>
+                    <div class="about_section">
+                        ${blogConfig[i].sub_title}
+                    </div>
+                </div>
+            </section>`;
+        blogsEl.appendChild(blogEl);
+    }
+
+}
+
 module.exports.updateHTML = async (username, opts) => {
     const {twitter, linkedin, medium} = opts;
     const user = await getUser(username);
@@ -116,6 +141,7 @@ module.exports.updateHTML = async (username, opts) => {
     console.log("Building HTML/CSS...");
 
     await addRepoDetails(document, username, opts);
+    await addBlogs(document);
     addMetaTags(document, user, data[0]);
 
     document.getElementById("profile_img").style.background = `url('${user.avatar_url}') center center`
