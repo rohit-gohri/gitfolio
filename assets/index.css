@@ -83,6 +83,7 @@ body{
     border-radius:50%;
     width:90px;
     height:90px;
+    margin-right: 2vw;
     background-size:cover !important;
     background-repeat: no-repeat;
 }

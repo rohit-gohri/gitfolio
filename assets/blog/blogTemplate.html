@@ -5,7 +5,7 @@
     <title>Lorem ipsum dolor</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="../../index.css">
 </head>
 <body>
     <div id="loading">
@@ -50,15 +50,6 @@
         document.getElementById("loading").style.display = "none";
         },800);
     },1500);
-    $.getJSON("../../config.json", function(user){
-        var icon = document.createElement("link");
-        icon.setAttribute("rel", "icon");
-        icon.setAttribute("href", user[0].userimg);
-        icon.setAttribute("type", "image/png");
-        document.getElementsByTagName("head")[0].appendChild(icon);
-        document.getElementById("profile_img_blog").style.background = `url('${user[0].userimg}') center center`;
-        document.getElementById("username_blog").innerHTML = `<spanstyle="display:${user[0].name == null || !user[0].name ? 'none' : 'block'};">${user[0].name}</span><br>@${user[0].username}<b id="blog_time"></b>`;
-    });
     </script>
 
 </body></html>

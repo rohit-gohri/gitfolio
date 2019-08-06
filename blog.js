@@ -5,7 +5,7 @@ const jsdom = require('jsdom').JSDOM,
 options = {
     resources: "usable"
 };
-const {getBlog, updateBlog, outDir} = require('./utils');
+const {getConfig, getBlog, updateBlog, outDir} = require('./utils');
 
 async function createBlog(title, {subtitle, pagetitle, folder, image} = {}) {
     if (!pagetitle) {
@@ -26,15 +26,35 @@ async function createBlog(title, {subtitle, pagetitle, folder, image} = {}) {
     }
 
     const blogPath = `${outDir}/blog/${folder}/index.html`;
-
+    const blog_data = {
+        created_at: new Date(),
+        url_title: folder,
+        title: title,
+        sub_title: subtitle,
+        top_image: image || "https://images.unsplash.com/photo-1553748024-d1b27fb3f960?w=1450",
+        visible: true,
+    };
+    const conf = await getConfig();
     await fs.copyFileAsync(`${__dirname}/assets/blog/blogTemplate.html`, blogPath);
     const dom = await jsdom.fromFile(blogPath, options);
     const window = dom.window;
     const document = window.document;
-    const style = document.createElement("link");
-    style.setAttribute("rel","stylesheet")
-    style.setAttribute("href","../../index.css");
-    document.getElementsByTagName("head")[0].appendChild(style);
+
+    const icon = document.createElement("link");
+    icon.setAttribute("rel", "icon");
+    icon.setAttribute("href", conf[0].userimg);
+    icon.setAttribute("type", "image/png");
+    document.getElementsByTagName("head")[0].appendChild(icon);
+
+    document.getElementById("profile_img_blog").style.background = `url('${conf[0].userimg}') center center`;
+    document.getElementById("username_blog").innerHTML =
+        `<spanstyle="display:${!conf[0].name ? 'none' : 'block'};">
+            ${conf[0].name}
+        </span>
+        <br>@${conf[0].username}
+        <br><b id="blog_time" data-iso="${blog_data.created_at.toISOString()}">
+            ${blog_data.created_at.toLocaleDateString()}
+        </b>`;
     
     document.getElementsByTagName("title")[0].textContent = pagetitle;
     document.getElementById("blog_title").textContent = title;
@@ -43,13 +63,6 @@ async function createBlog(title, {subtitle, pagetitle, folder, image} = {}) {
     await fs.writeFileAsync(`${outDir}/blog/${folder}/index.html`,
         '<!DOCTYPE html>'+window.document.documentElement.outerHTML);
 
-    const blog_data = {
-        url_title: folder,
-        title: title,
-        sub_title: subtitle,
-        top_image: image || "https://images.unsplash.com/photo-1553748024-d1b27fb3f960?w=1450",
-        visible: true,
-    };
     const old_blogs = await getBlog();
     old_blogs.push(blog_data);
     await updateBlog(old_blogs);
