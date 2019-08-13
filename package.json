@@ -7,7 +7,7 @@
   "scripts": {
     "cli": "OUT_DIR='./dist' node bin/gitfolio.js",
     "clean": "rm -rf ./dist/*",
-    "prettier": "prettier --write \"./**/*.{js,jsx,json,html,css,md}\"",
+    "prettier": "prettier --write \"./**/*.{js,jsx,json,html,css,md}\" --ignore-path .gitignore",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": {
