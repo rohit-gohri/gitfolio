@@ -87,6 +87,7 @@ async function buildCommand(username, program) {
         twitter: program.twitter,
         linkedin: program.linkedin,
         medium: program.medium,
+    dribbble: program.dribbble
     };
 
     await populateConfig(opts);

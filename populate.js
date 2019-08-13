@@ -136,7 +136,7 @@ async function addBlogs(document) {
 }
 
 module.exports.updateHTML = async (username, opts) => {
-    const {twitter, linkedin, medium} = opts;
+    const { twitter, linkedin, medium, dribbble } = opts;
     const user = await getUser(username);
     const data = await getConfig();
     data[0].username = user.login;
@@ -173,30 +173,41 @@ module.exports.updateHTML = async (username, opts) => {
         <span style="display:${!user.email ? 'none' : 'block'};">
             <i class="fas fa-envelope"></i> &nbsp; ${user.email}
         </span>
-        <span style="display:${!user.blog ? 'none' : 'block'};">
-            <i class="fas fa-link"></i> &nbsp; <a href="${user.blog}">${user.blog}</a>
+        <span style="display:${!user.blog ? "none" : "block"};">
+            <i class="fas fa-link"></i> &nbsp;
+            <a href="${user.blog}">${user.blog}</a>
         </span>
-        <span style="display:${!twitter? 'none' : 'block'};">
-            <i class="fab fa-twitter-square"></i> &nbsp;&nbsp; <a href="https://www.twitter.com/${twitter}" target="_blank" class="socials"> Twitter</a>
-        </span>
-        <span style="display:${!linkedin? 'none' : 'block'};">
-            <i class="fab fa-linkedin"></i> &nbsp;&nbsp; <a href="https://www.linkedin.com/in/${linkedin}/" target="_blank" class="socials"> LinkedIn</a>
-        </span>
-        <span style="display:${!medium? 'none' : 'block'};">
-            <i class="fab fa-medium"></i> &nbsp;&nbsp; <a href="https://www.medium.com/@${medium}/" target="_blank" class="socials"> Medium</a>
-        </span>
-        <span style="display:${!user.location ? 'none' : 'block'};">
+        <span style="display:${!user.location ? "none" : "block"};">
             <i class="fas fa-map-marker-alt"></i> &nbsp;&nbsp; ${user.location}
         </span>`;
 
-    about += 
-        `<span style="display:${user.hireable == false || !user.hireable ? 'none' : 'block'};">
+  about += `<span style="display:${
+    user.hireable == false || !user.hireable ? "none" : "block"
+  };">
             <i class="fas fa-user-tie"></i>
             &nbsp;&nbsp;
-            ${data[0].hireLink ? `<a href="${data[0].hireLink}" target="_blank">` : ''}
+            ${
+              data[0].hireLink
+                ? `<a href="${data[0].hireLink}" target="_blank">`
+                : ""
+            }
             Available for hire
-            ${data[0].hireLink ? `</a>` : ''}
+            ${data[0].hireLink ? `</a>` : ""}
         </span>`;
+  about += `<div class="socials">
+    <span style="display:${!twitter ? "none !important" : "block"};">
+      <a href="https://www.twitter.com/${twitter}" target="_blank" class="socials"><i class="fab fa-twitter"></i></a>
+    </span>
+    <span style="display:${!dribbble ? "none !important" : "block"};">
+      <a href="https://www.dribbble.com/${dribbble}" target="_blank" class="socials"><i class="fab fa-dribbble"></i></a>
+    </span>
+    <span style="display:${!linkedin ? "none !important" : "block"};">
+      <a href="https://www.linkedin.com/in/${linkedin}/" target="_blank" class="socials"><i class="fab fa-linkedin-in"></i></a>
+    </span>
+    <span style="display:${!medium ? "none !important" : "block"};">
+      <a href="https://www.medium.com/@${medium}/" target="_blank" class="socials"><i class="fab fa-medium-m"></i></a>
+    </span>
+  `
 
     document.getElementById("about").innerHTML = about;
 

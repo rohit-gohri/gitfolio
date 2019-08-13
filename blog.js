@@ -70,6 +70,16 @@ async function createBlog(title, {
             ${blog_data.created_at.toLocaleDateString()}
         </b>`;
     
+  
+  if ((conf[0].theme = "dark.css")) {
+    document.querySelector("#background_overlay").style.background =
+      "linear-gradient(0deg, rgba(10, 10, 10, 1), rgba(10, 10, 10, 0.1))";
+  } else {
+    document.querySelector("#background_overlay").style.background =
+      "linear-gradient(0deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.1))";
+  }
+
+
     document.getElementsByTagName("title")[0].textContent = pagetitle;
     document.getElementById("blog_title").textContent = title;
     document.getElementById("blog_sub_title").textContent = subtitle;

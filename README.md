@@ -1,13 +1,14 @@
 <img src="https://i.imgur.com/eA6clZr.png">
 
-# Gitfolio  [![Tweet](https://img.shields.io/twitter/url/https/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=personal%20website%20and%20a%20blog%20for%20every%20github%20user%20&url=https://github.com/imfunniee/gitfolio) ![GitHub release](https://img.shields.io/github/release/imfunniee/gitfolio.svg?style=popout-square) ![npm](https://img.shields.io/npm/dm/gitfolio.svg?style=popout-square) ![GitHub top language](https://img.shields.io/github/languages/top/imfunniee/gitfolio.svg?style=popout-square) ![GitHub last commit](https://img.shields.io/github/last-commit/imfunniee/gitfolio.svg?style=popout-square) ![GitHub](https://img.shields.io/github/license/imfunniee/gitfolio.svg?style=popout-square)
-  
-### personal website + blog  for every github user
+# Gitfolio
+
+[![Tweet](https://img.shields.io/twitter/url/https/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=personal%20website%20and%20a%20blog%20for%20every%20github%20user%20@imfunnieee%20&url=https://github.com/imfunniee/gitfolio) ![GitHub release](https://img.shields.io/github/release/imfunniee/gitfolio.svg?style=popout-square) ![npm](https://img.shields.io/npm/dm/gitfolio.svg?style=popout-square) ![GitHub top language](https://img.shields.io/github/languages/top/imfunniee/gitfolio.svg?style=popout-square) ![GitHub last commit](https://img.shields.io/github/last-commit/imfunniee/gitfolio.svg?style=popout-square) ![GitHub](https://img.shields.io/github/license/imfunniee/gitfolio.svg?style=popout-square) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+
+### personal website + blog for every github user
 
 Gitfolio will help you get started with a portfolio website where you could showcase your work + a blog that will help you spread your ideas into real world.
 
 Check out this [live demo](https://imfunniee.github.io/gitfolio/) to see gitfolio in action.
-
 
 # Getting Started
 
@@ -24,18 +25,16 @@ npm i gitfolio -g
 ```sh
 gitfolio build <username>
 ```
+
 `<username>` is your username on github. This will build your website using your GitHub username and put it in the `/dist` folder.
 
-To run your website use `run` command
+To run your website use `run` command, Default port is 3000
 
 ```sh
-gitfolio run
+gitfolio run -p [port]
 ```
 
-Open your browser at http://localhost:3000
-
 🎉 Congrats, you just made yourself a personal website!
-
 
 ### Let's Customize
 
@@ -67,11 +66,13 @@ $ gitfolio build <username> --sort star --order desc
 
 Themes are specified using the `--theme [theme-name]` flag when running the `build` command. The available themes are
 
-* `light`
-* `dark`
+- `light`
+- `dark`
+
 > TODO: Add more themes
 
 For example, the following command will build the website with the dark theme
+
 ```sh
 $ gitfolio build <username> --theme dark
 ```
@@ -86,18 +87,19 @@ $ gitfolio build <username> --background https://images.unsplash.com/photo-15572
 
 You could also add in your custom CSS inside `index.css` to give it a more personal feel.
 
-### Add Twitter, LinkedIn and Medium Links on your profile
+#### Add Social Media links on your profile
 
-Twitter, LinkedIn and Medium Links to your profile while building
+Twitter, LinkedIn, Medium & Dribbble links to your profile while building
+
 ```sh
-gitfolio build <username> --twitter <twitter_username> --linkedin <linkedin_username> --medium <medium_username>
+gitfolio build <username> --twitter <twitter_username> --linkedin <linkedin_username> --medium <medium_username> --dribbble <dribbble_username>
 ```
+
 ### Let's Publish
 
 Head over to GitHub and create a new repository named `username.github.io`, where username is your username. Push the files inside`/dist` folder to repo you just created.
 
 Go To `username.github.io` your site should be up!!
-
 
 ### Updating
 
@@ -106,10 +108,12 @@ To update your info, simply run
 ```sh
 $ gitfolio update
 ```
+
+or use the `Update` options in gitfolio's UI
+
 This will update your info and your repository info.
 
 To Update background or theme you need to run `build` command again.
-
 
 ### Add a Blog
 
@@ -118,6 +122,7 @@ To add your first blog run this command.
 ```sh
 $ gitfolio blog my-first-blog
 ```
+
 > (use "-" instead of spaces)
 
 This will create a `my-first-blog` folder inside `blog`. Inside `my-first-blog` you will find an `index.html` file which contains all the necessary elements for writing a blog. Customize the content of the file to write your first blog.
@@ -126,7 +131,8 @@ This also adds content to `blog.json` file. This file helps in showcasing your b
 
 Blog Demo? [here](https://imfunniee.github.io/gitfolio/blog/my-first-post/)
 
-Default JSON Format
+Blog's default JSON Format
+
 ```
 {
   "url_title": "my-first-blog", // the title you provide while creating a new blog, this appears in url
@@ -147,6 +153,8 @@ More Arguments for Blog
 
 > (use "-" instead of spaces)
 
+### Follow me on twitter for more updates [@imfunnieee](https://twitter.com/imfunnieee)
 
-## License
+### License
+
 ![GitHub](https://img.shields.io/github/license/imfunniee/gitfolio.svg?style=popout-square)

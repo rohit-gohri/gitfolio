@@ -24,10 +24,11 @@ program
     .option('-i, --include [types]', 'specifiy type of repos to include(can be multiple) : \'all\', \'owner\', \'member\'', collect, [])
     .option('-s, --sort [sort]', 'set default sort for repository', 'created')
     .option('-o, --order [order]', 'set default order on sort', 'asc')
-    .option('-w, --twitter [handle]', 'set Twitter handle')
-    .option('-l, --linkedin [username]', 'specify LinkedIn username')
-    .option('-m, --medium [username]', 'specify Medium username')
-    .action(buildCommand)
+    .option("-w, --twitter [username]", "specify twitter username")
+    .option("-l, --linkedin [username]", "specify linkedin username")
+    .option("-m, --medium [username]", "specify medium username")
+    .option("-d, --dribbble [username]", "specify dribbble username")
+    .action(buildCommand);
 
 program
     .command('update')
@@ -45,9 +46,14 @@ program
     .action(blogCommand);
 
 program
-    .command('run')
-    .description('Run build files')
-    .action(runCommand);
+  .command("run")
+  .description("Run build files")
+  .option(
+    "-p, --port [port]",
+    "provide a port for localhost, default is 3000",
+    3000
+  )
+  .action(runCommand);
 
 program.on('command:*', () => {
     console.log('Unknown Command: ' + program.args.join(' '))
