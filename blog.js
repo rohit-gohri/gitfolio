@@ -1,6 +1,7 @@
 const _ = require("lodash");
 const bluebird = require("bluebird");
 const fs = bluebird.promisifyAll(require("fs"));
+const marked = require('marked');
 const jsdom = require("jsdom").JSDOM,
   options = {
     resources: "usable"
@@ -56,8 +57,28 @@ async function initBlogFiles(folder, blog_data, conf) {
 
   if (!fs.existsSync(`${outDir}/blog/${folder}/index.md`)) {
     // Create empty md file
-    await fs.writeFileAsync(`${outDir}/blog/${folder}/index.md`, "");
+    await fs.writeFileAsync(`${outDir}/blog/${folder}/index.md`, "Dummy Blog Content!");
   }
+}
+
+async function updateBlogContent(blogData, conf) {
+  const blogPath = `${outDir}/blog/${blogData.url_title}/index`;
+  const markdownContent = await fs.readFileAsync(`${blogPath}.md`);
+  const html = marked(markdownContent.toString(), {
+    baseUrl: conf[0].url,
+    gfm: true,
+    headerIds: true,
+    headerPrefix: 'heading-',
+  });
+  const dom = await jsdom.fromFile(`${blogPath}.html`, options);
+  const window = dom.window;
+  const document = window.document;
+  document.getElementById("blog").innerHTML = html;
+  
+  await fs.writeFileAsync(
+    `${blogPath}.html`,
+    "<!DOCTYPE html>" + window.document.documentElement.outerHTML
+  );
 }
 
 async function createBlog(
@@ -117,7 +138,6 @@ async function createBlog(
     old_blogs.push(blog_data);
   }
   await updateBlog(old_blogs);
-  await updateHTML(conf[0].username, conf[0]);
 }
 
 async function blogCommand(title, program) {
@@ -132,5 +152,6 @@ async function blogCommand(title, program) {
 }
 
 module.exports = {
-  blogCommand
+  blogCommand,
+  updateBlogContent,
 };
