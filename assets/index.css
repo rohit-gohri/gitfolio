@@ -316,7 +316,6 @@ body {
 
 /* Style the collapsible content. Note: hidden by default */
 .collapsible-content {
-  padding: 0 18px;
   background-color: white;
   max-height: 0;
   overflow: hidden;
