@@ -6,6 +6,7 @@ const jsdom = require("jsdom").JSDOM,
   options = {
     resources: "usable"
   };
+const {updateBlogContent} = require('./blog');
 const { getBlog, getConfig, updateConfig, outDir } = require("./utils");
 const { getRepos, getUser } = require("./api");
 
@@ -129,7 +130,7 @@ function addMetaTags(document, user, config = {}) {
   });
 }
 
-async function addBlogs(document) {
+async function addAndUpdateBlogs(document, conf) {
   const blogConfig = await getBlog();
   if (blogConfig.length == 0) {
     return (document.getElementById("blog_section").style.display = "none");
@@ -137,18 +138,22 @@ async function addBlogs(document) {
   const blogsEl = document.getElementById("blogs");
   for (var i = 0; i < blogConfig.length; i++) {
     const blogEl = document.createElement("a");
-    blogEl.setAttribute("href", `./blog/${blogConfig[i].url_title}/`);
+    const blogData = blogConfig[i];
+
+    blogEl.setAttribute("href", `./blog/${blogData.url_title}/`);
     blogEl.setAttribute("target", "_blank");
     blogEl.innerHTML = `<section>
-      <img src="${blogConfig[i].top_image}">
+      <img src="${blogData.top_image}">
       <div class="blog_container">
-          <div class="section_title">${blogConfig[i].title}</div>
+          <div class="section_title">${blogData.title}</div>
           <div class="about_section">
-              ${blogConfig[i].sub_title}
+              ${blogData.sub_title}
           </div>
       </div>
     </section>`;
     blogsEl.appendChild(blogEl);
+
+    await updateBlogContent(blogData, conf);
   }
 }
 
@@ -169,7 +174,7 @@ module.exports.updateHTML = async (username, opts) => {
   console.log("Building HTML/CSS...");
 
   await addRepoDetails(document, username, opts);
-  await addBlogs(document);
+  await addAndUpdateBlogs(document, data);
   addMetaTags(document, user, data[0]);
 
   document.getElementById(
